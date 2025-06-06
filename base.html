@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Directory Hub{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #1e5799;
+            --secondary-color: #2989d8;
+            --accent-color: #7db9e8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f8fa;
+        }
+        
+        /* Sidebar */
+        #sidebar {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e5799 0%, #2989d8 50%, #7db9e8 100%);
+            padding: 20px 0;
+            color: white;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .nav-item {
+            margin: 2px 0;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .nav-header {
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 700;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+        
+        /* Stat Cards */
+        .stat-card {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            margin-bottom: 0;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* Directory Cards */
+        .directory-card {
+            overflow: hidden;
+        }
+        
+        .directory-image {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s;
+        }
+        
+        .directory-card:hover .directory-image {
+            transform: scale(1.05);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Login Form */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .mobile-nav-menu {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 10px 0;
+        }
+        
+        .mobile-nav-menu li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        
+        .mobile-nav-menu li a i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .mobile-nav-menu li a.active {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+        
+        .chart-container.loading::before {
+            content: "Loading data...";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .chart-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 767.98px) {
+            main {
+                margin-bottom: 70px; /* Space for mobile nav */
+            }
+            
+            .chart-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-controls select, 
+            .chart-controls .form-check {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (mobileMenuToggle && sidebar) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sidebar.classList.toggle('d-md-block');
+                    sidebar.classList.toggle('d-block');
+                });
+            }
+            
+            // Password strength meter
+            const passwordInput = document.getElementById('password');
+            const strengthMeter = document.getElementById('password-strength-meter');
+            
+            if (passwordInput && strengthMeter) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    let strength = 0;
+                    
+                    // Length check
+                    if (password.length >= 10) strength += 1;
+                    
+                    // Uppercase check
+                    if (/[A-Z]/.test(password)) strength += 1;
+                    
+                    // Lowercase check
+                    if (/[a-z]/.test(password)) strength += 1;
+                    
+                    // Number check
+                    if (/[0-9]/.test(password)) strength += 1;
+                    
+                    // Symbol check
+                    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                    
+                    // Update meter
+                    strengthMeter.value = strength;
+                    
+                    // Update color
+                    switch(strength) {
+                        case 0:
+                        case 1:
+                            strengthMeter.className = 'progress-bar bg-danger';
+                            break;
+                        case 2:
+                        case 3:
+                            strengthMeter.className = 'progress-bar bg-warning';
+                            break;
+                        case 4:
+                        case 5:
+                            strengthMeter.className = 'progress-bar bg-success';
+                            break;
+                    }
+                    
+                    // Update width
+                    strengthMeter.style.width = (strength * 20) + '%';
+                });
+            }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

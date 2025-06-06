@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory Hub - Professional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="img/favicon.png">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Directory Hub</h3>
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <img src="img/user-avatar.png" alt="User Avatar" class="user-avatar">
+                <div class="user-info">
+                    <h5 id="user-name">Admin User</h5>
+                    <p id="user-role">Administrator</p>
+                </div>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-page="businesses">
+                        <i class="fas fa-building"></i>
+                        Businesses
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-page="documents">
+                        <i class="fas fa-file-alt"></i>
+                        Documents
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-page="promotional-texts">
+                        <i class="fas fa-bullhorn"></i>
+                        Promotional Texts
+                    </a>
+                </li>
+                <li class="admin-only">
+                    <a href="#" data-page="users">
+                        <i class="fas fa-users"></i>
+                        Users
+                    </a>
+                </li>
+                <li class="admin-only">
+                    <a href="#" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </li>
+                <li class="sidebar-heading">
+                    <span>Tool Box</span>
+                </li>
+                <li>
+                    <a href="https://www.ymlp.com" target="_blank">
+                        <i class="fas fa-envelope"></i>
+                        Email Marketing
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.postalmethods.com" target="_blank">
+                        <i class="fas fa-mail-bulk"></i>
+                        Postal Mail Service
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.avery.com/templates" target="_blank">
+                        <i class="fas fa-tag"></i>
+                        Label Templates
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.dialmycalls.com" target="_blank">
+                        <i class="fas fa-phone"></i>
+                        Mass Calls & Texting
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-page="promotional-texts">
+                        <i class="fas fa-bullhorn"></i>
+                        Promotional Texts
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="navbar-title">
+                        <h4 id="page-title">Dashboard</h4>
+                    </div>
+                    <div class="ml-auto">
+                        <div class="role-switcher">
+                            <select id="role-select" class="form-select">
+                                <option value="admin">Admin View</option>
+                                <option value="manager">Manager View</option>
+                                <option value="staff">Staff View</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="container-fluid main-content">
+                <!-- Login Page -->
+                <div id="login-page" class="content-page">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card shadow login-card">
+                                <div class="card-header">
+                                    <h4 class="text-center">Directory Hub Login</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form id="login-form">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="email" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="password" required>
+                                        </div>
+                                        <div class="mb-3 form-check">
+                                            <input type="checkbox" class="form-check-input" id="remember-me">
+                                            <label class="form-check-label" for="remember-me">Remember me</label>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary">Login</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <small>Forgot your password? Contact your administrator.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="content-page">
+                    <!-- Stats Cards -->
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Total Businesses</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">152</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Vehicle Dealerships</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">48</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-car fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Real Estate Professionals</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">64</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-home fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Apartment Rentals</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">40</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+                        <!-- Business Distribution Chart -->
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Business Distribution by State</h6>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Chart Options:</div>
+                                            <a class="dropdown-item chart-type" data-type="bar" href="#">Bar Chart</a>
+                                            <a class="dropdown-item chart-type" data-type="pie" href="#">Pie Chart</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#" id="download-chart">Download Chart</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-filters mb-3">
+                                        <select id="business-type-filter" class="form-select">
+                                            <option value="all">All Business Types</option>
+                                            <option value="vehicle">Vehicle Dealerships</option>
+                                            <option value="realestate">Real Estate Professionals</option>
+                                            <option value="apartment">Apartment Rentals</option>
+                                        </select>
+                                    </div>
+                                    <div class="chart-area">
+                                        <canvas id="businessDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="activity-list">
+                                        <div class="activity-item">
+                                            <div class="activity-icon bg-primary">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">Admin User logged in</div>
+                                                <div class="activity-time">Today, 10:30 AM</div>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon bg-success">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">New business added: Johnson Auto Sales</div>
+                                                <div class="activity-time">Today, 9:15 AM</div>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon bg-info">
+                                                <i class="fas fa-file"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">Document updated: Q2 Marketing Plan</div>
+                                                <div class="activity-time">Yesterday, 4:30 PM</div>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon bg-warning">
+                                                <i class="fas fa-user-edit"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">User profile updated: Manager User</div>
+                                                <div class="activity-time">Yesterday, 2:45 PM</div>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon bg-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">Business removed: Smith Properties</div>
+                                                <div class="activity-time">Jun 3, 11:20 AM</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Businesses Page -->
+                <div id="businesses-page" class="content-page">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Business Directory</h6>
+                            <div class="admin-manager-only">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Add Business
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="businessTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Location</th>
+                                            <th>Contact</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Johnson Auto Sales</td>
+                                            <td>Vehicle Dealership</td>
+                                            <td>Austin, TX</td>
+                                            <td>(512) 555-1234</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Smith Properties</td>
+                                            <td>Real Estate Professional</td>
+                                            <td>Miami, FL</td>
+                                            <td>(305) 555-6789</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Lakeside Apartments</td>
+                                            <td>Apartment Rental</td>
+                                            <td>Chicago, IL</td>
+                                            <td>(312) 555-9012</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>City Motors</td>
+                                            <td>Vehicle Dealership</td>
+                                            <td>Los Angeles, CA</td>
+                                            <td>(213) 555-3456</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Urban Realty Group</td>
+                                            <td>Real Estate Professional</td>
+                                            <td>New York, NY</td>
+                                            <td>(212) 555-7890</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Page -->
+                <div id="documents-page" class="content-page">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Document Library</h6>
+                            <div class="admin-manager-only">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Upload Document
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="documentsTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Category</th>
+                                            <th>Date Added</th>
+                                            <th>Added By</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Q2 Marketing Plan.pdf</td>
+                                            <td>Marketing</td>
+                                            <td>Jun 1, 2025</td>
+                                            <td>Admin User</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Business Directory Guidelines.docx</td>
+                                            <td>Policies</td>
+                                            <td>May 15, 2025</td>
+                                            <td>Manager User</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Email Templates.zip</td>
+                                            <td>Marketing</td>
+                                            <td>May 10, 2025</td>
+                                            <td>Staff User</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Annual Report 2024.pdf</td>
+                                            <td>Reports</td>
+                                            <td>Apr 30, 2025</td>
+                                            <td>Admin User</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Business Listing Form.pdf</td>
+                                            <td>Forms</td>
+                                            <td>Apr 15, 2025</td>
+                                            <td>Manager User</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm admin-manager-only">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promotional Texts Page -->
+                <div id="promotional-texts-page" class="content-page">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Promotional Text Templates</h6>
+                            <div class="admin-manager-only">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Add Template
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="accordion" id="promotionalTextsAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            New Business Welcome
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                                        data-bs-parent="#promotionalTextsAccordion">
+                                        <div class="accordion-body">
+                                            <p>Welcome to the Directory Hub! We're excited to have [BUSINESS_NAME] join our network of local businesses. Your listing is now live and visible to all our users. To maximize your exposure, consider updating your profile with high-quality images and detailed service information.</p>
+                                            <div class="mt-3 admin-manager-only">
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingTwo">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            Monthly Newsletter Announcement
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                                        data-bs-parent="#promotionalTextsAccordion">
+                                        <div class="accordion-body">
+                                            <p>Our monthly newsletter is now available! This month features [FEATURE_BUSINESS], tips for maximizing your online presence, and upcoming networking events in your area. Check your email for the full newsletter or view it online at [NEWSLETTER_LINK].</p>
+                                            <div class="mt-3 admin-manager-only">
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingThree">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            Special Promotion Announcement
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                                        data-bs-parent="#promotionalTextsAccordion">
+                                        <div class="accordion-body">
+                                            <p>[BUSINESS_NAME] is offering an exclusive promotion for Directory Hub members! [PROMOTION_DETAILS]. This offer is valid until [END_DATE]. Contact them directly at [CONTACT_INFO] to take advantage of this special offer.</p>
+                                            <div class="mt-3 admin-manager-only">
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFour">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                            Profile Update Reminder
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                                        data-bs-parent="#promotionalTextsAccordion">
+                                        <div class="accordion-body">
+                                            <p>It's time to refresh your business profile! We've noticed that [BUSINESS_NAME] hasn't updated their listing in over [TIME_PERIOD]. Businesses with recent updates receive 40% more views. Log in today to update your information, add new photos, or highlight recent achievements.</p>
+                                            <div class="mt-3 admin-manager-only">
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFive">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                            Event Invitation
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
+                                        data-bs-parent="#promotionalTextsAccordion">
+                                        <div class="accordion-body">
+                                            <p>You're invited to our [EVENT_NAME] on [EVENT_DATE] at [EVENT_LOCATION]! This is a great opportunity to network with other local businesses and learn about [EVENT_TOPIC]. RSVP by [RSVP_DATE] to secure your spot. We look forward to seeing you there!</p>
+                                            <div class="mt-3 admin-manager-only">
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button class="btn btn-danger btn-sm admin-only">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Page (Admin Only) -->
+                <div id="users-page" class="content-page admin-only">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">User Management</h6>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Department</th>
+                                            <th>Last Login</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Admin User</td>
+                                            <td>admin@directoryhub.com</td>
+                                            <td>Admin</td>
+                                            <td>Management</td>
+                                            <td>Today, 10:30 AM</td>
+                                            <td><span class="badge bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Manager User</td>
+                                            <td>manager@directoryhub.com</td>
+                                            <td>Manager</td>
+                                            <td>Operations</td>
+                                            <td>Yesterday, 2:45 PM</td>
+                                            <td><span class="badge bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Staff User</td>
+                                            <td>staff@directoryhub.com</td>
+                                            <td>Staff</td>
+                                            <td>Support</td>
+                                            <td>Jun 3, 9:15 AM</td>
+                                            <td><span class="badge bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>John Smith</td>
+                                            <td>john@directoryhub.com</td>
+                                            <td>Staff</td>
+                                            <td>Marketing</td>
+                                            <td>May 30, 11:20 AM</td>
+                                            <td><span class="badge bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jane Doe</td>
+                                            <td>jane@directoryhub.com</td>
+                                            <td>Manager</td>
+                                            <td>Sales</td>
+                                            <td>May 28, 3:45 PM</td>
+                                            <td><span class="badge bg-danger">Inactive</span></td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page (Admin Only) -->
+                <div id="settings-page" class="content-page admin-only">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">System Settings</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="siteName" class="form-label">Site Name</label>
+                                            <input type="text" class="form-control" id="siteName" value="Directory Hub">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="siteDescription" class="form-label">Site Description</label>
+                                            <textarea class="form-control" id="siteDescription" rows="3">A comprehensive business directory management system.</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="contactEmail" class="form-label">Contact Email</label>
+                                            <input type="email" class="form-control" id="contactEmail" value="contact@directoryhub.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="itemsPerPage" class="form-label">Items Per Page</label>
+                                            <select class="form-select" id="itemsPerPage">
+                                                <option value="10">10</option>
+                                                <option value="25" selected>25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Security Settings</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="passwordPolicy" class="form-label">Password Policy</label>
+                                            <select class="form-select" id="passwordPolicy">
+                                                <option value="standard">Standard (8+ chars, 1 uppercase, 1 number)</option>
+                                                <option value="strong" selected>Strong (10+ chars, mixed case, numbers, symbols)</option>
+                                                <option value="custom">Custom</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="passwordExpiration" class="form-label">Password Expiration</label>
+                                            <select class="form-select" id="passwordExpiration">
+                                                <option value="30">30 Days</option>
+                                                <option value="60">60 Days</option>
+                                                <option value="90" selected>90 Days</option>
+                                                <option value="180">180 Days</option>
+                                                <option value="never">Never</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sessionTimeout" class="form-label">Session Timeout</label>
+                                            <select class="form-select" id="sessionTimeout">
+                                                <option value="15">15 Minutes</option>
+                                                <option value="30" selected>30 Minutes</option>
+                                                <option value="60">60 Minutes</option>
+                                                <option value="120">2 Hours</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 form-check">
+                                            <input type="checkbox" class="form-check-input" id="twoFactorAuth" checked>
+                                            <label class="form-check-label" for="twoFactorAuth">Enable Two-Factor Authentication for Admins</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Directory Hub 2025</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav">
+        <a href="#" data-page="dashboard" class="mobile-nav-item active">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" data-page="businesses" class="mobile-nav-item">
+            <i class="fas fa-building"></i>
+            <span>Businesses</span>
+        </a>
+        <a href="#" data-page="documents" class="mobile-nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Documents</span>
+        </a>
+        <a href="#" data-page="promotional-texts" class="mobile-nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>Promo</span>
+        </a>
+        <a href="#" class="mobile-nav-item" id="mobile-more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+        </a>
+    </div>
+
+    <!-- Mobile More Menu -->
+    <div class="mobile-more-menu">
+        <div class="mobile-more-menu-header">
+            <h5>More Options</h5>
+            <button class="close-more-menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-more-menu-content">
+            <a href="#" data-page="users" class="mobile-more-menu-item admin-only">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </a>
+            <a href="#" data-page="settings" class="mobile-more-menu-item admin-only">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" id="mobile-logout" class="mobile-more-menu-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/api-client.js"></script>
+</body>
+</html>

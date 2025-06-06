@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory Hub - User Management Demo</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Role Switcher for Demo Purposes -->
+    <div class="position-fixed top-0 end-0 p-3 bg-light border rounded shadow-sm" style="z-index: 1050;">
+        <div class="d-flex align-items-center">
+            <span class="me-2">Current Role: <strong id="current-role-display">Admin</strong></span>
+            <select id="role-switcher" class="form-select form-select-sm">
+                <option value="Admin">Switch to Admin</option>
+                <option value="Manager">Switch to Manager</option>
+                <option value="Staff">Switch to Staff</option>
+            </select>
+        </div>
+    </div>
+    
+    <style>
+        :root {
+            --primary-color: #1e5799;
+            --secondary-color: #2989d8;
+            --accent-color: #7db9e8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f8fa;
+        }
+        
+        /* Sidebar */
+        #sidebar {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e5799 0%, #2989d8 50%, #7db9e8 100%);
+            padding: 20px 0;
+            color: white;
+            position: fixed;
+            width: 250px;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .nav-item {
+            margin: 2px 0;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .nav-header {
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 700;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+        
+        /* Stat Cards */
+        .stat-card {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            margin-bottom: 0;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .mobile-nav-menu {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 10px 0;
+        }
+        
+        .mobile-nav-menu li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        
+        .mobile-nav-menu li a i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .mobile-nav-menu li a.active {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        /* User Management Styles */
+        .user-card {
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .user-card .card-header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .badge-role {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: normal;
+        }
+        
+        .badge-admin {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .badge-manager {
+            background-color: #fd7e14;
+            color: white;
+        }
+        
+        .badge-staff {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        /* Password Strength Meter */
+        .password-strength-meter {
+            height: 5px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        
+        /* Login Form */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            #sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 70px; /* Space for mobile nav */
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+            
+            .chart-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-controls select, 
+            .chart-controls .form-check {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Directory Hub</h3>
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#businesses">
+                    <i class="fas fa-building"></i> Businesses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#documents">
+                    <i class="fas fa-file-alt"></i> Documents
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#promotional-texts">
+                    <i class="fas fa-comment-alt"></i> Promotional Texts
+                </a>
+            </li>
+            
+            <!-- User Management - Only visible to Admin -->
+            <li class="nav-item admin-only">
+                <a class="nav-link" href="#user-management">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+            </li>
+            <!-- Permissions - Only visible to Admin -->
+            <li class="nav-item admin-only">
+                <a class="nav-link" href="#permissions">
+                    <i class="fas fa-lock"></i> Permissions
+                </a>
+            </li>
+            <!-- Activity Log - Only visible to Admin and Manager -->
+            <li class="nav-item admin-manager-only">
+                <a class="nav-link" href="#activity-log">
+                    <i class="fas fa-history"></i> Activity Log
+                </a>
+            </li>
+            
+            <!-- Settings - Only visible to Admin and Manager -->
+            <li class="nav-item admin-manager-only">
+                <a class="nav-link" href="#settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </li>
+            
+            <!-- Tool Box Section -->
+            <li class="nav-header">
+                <span>Tool Box</span>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="https://ymlp.com" target="_blank">
+                    <i class="fas fa-envelope"></i> Email Marketing
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://postalmethods.com" target="_blank">
+                    <i class="fas fa-mail-bulk"></i> Postal Mail
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://avery.com/templates" target="_blank">
+                    <i class="fas fa-tag"></i> Label Making
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://dialmycalls.com" target="_blank">
+                    <i class="fas fa-phone"></i> Mass Calls & Texting
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#promotional-texts">
+                    <i class="fas fa-comment-dots"></i> Promotional Texts
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="#login">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Dashboard</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="export-chart-button">Export Chart</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h3>152</h3>
+                        <p>Total Businesses</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h3>48</h3>
+                        <p>Vehicle Dealerships</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h3>64</h3>
+                        <p>Real Estate Professionals</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h3>40</h3>
+                        <p>Apartment Rentals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- State Distribution Chart -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Business Distribution by State</h5>
+                        <div class="chart-controls d-flex">
+                            <select id="business-type-filter" class="form-select form-select-sm me-2">
+                                <option value="all">All Business Types</option>
+                                <option value="Vehicle Dealership">Vehicle Dealership</option>
+                                <option value="Real Estate Professional">Real Estate Professional</option>
+                                <option value="Apartment Rental">Apartment Rental</option>
+                            </select>
+                            <select id="state-chart-filter" class="form-select form-select-sm me-2">
+                                <option value="all">All States</option>
+                                <option value="top5">Top 5 States</option>
+                                <option value="bottom5">Bottom 5 States</option>
+                            </select>
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input" type="checkbox" id="chart-type-toggle">
+                                <label class="form-check-label" for="chart-type-toggle">Pie Chart</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="state-distribution-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Management Section -->
+        <h2 id="user-management">User Management</h2>
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Users</h5>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>admin</td>
+                                        <td>Administrator</td>
+                                        <td>admin@directoryhub.com</td>
+                                        <td>IT</td>
+                                        <td>
+                                            <span class="badge badge-role badge-admin">Admin</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Active</span>
+                                        </td>
+                                        <td>2025-06-05 00:15</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                <button class="btn btn-sm btn-outline-warning">Reset Password</button>
+                                                <button class="btn btn-sm btn-outline-info">Permissions</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>manager</td>
+                                        <td>Manager User</td>
+                                        <td>manager@directoryhub.com</td>
+                                        <td>Sales</td>
+                                        <td>
+                                            <span class="badge badge-role badge-manager">Manager</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Active</span>
+                                        </td>
+                                        <td>2025-06-04 14:22</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                <button class="btn btn-sm btn-outline-warning">Reset Password</button>
+                                                <button class="btn btn-sm btn-outline-info">Permissions</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>staff</td>
+                                        <td>Staff User</td>
+                                        <td>staff@directoryhub.com</td>
+                                        <td>Support</td>
+                                        <td>
+                                            <span class="badge badge-role badge-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Active</span>
+                                        </td>
+                                        <td>2025-06-05 09:45</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                <button class="btn btn-sm btn-outline-warning">Reset Password</button>
+                                                <button class="btn btn-sm btn-outline-info">Permissions</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Permissions Section -->
+        <h2 id="permissions">Permissions</h2>
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tool Access Permissions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tool</th>
+                                        <th>Description</th>
+                                        <th>Admin</th>
+                                        <th>Manager</th>
+                                        <th>Staff</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Email Marketing</td>
+                                        <td>Use our directory data for targeted email marketing campaigns.</td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Postal Mail</td>
+                                        <td>Send physical mail to businesses in our directory.</td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Label Making</td>
+                                        <td>Create mailing labels from our directory data.</td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mass Calls & Texting</td>
+                                        <td>Send mass calls and text messages to businesses in our directory.</td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Promotional Texts</td>
+                                        <td>Access promotional text templates for NoteStacker.com.</td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                        <td><i class="fas fa-check text-success"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Log Section -->
+        <h2 id="activity-log">Activity Log</h2>
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Recent Activity</h5>
+                        <button class="btn btn-outline-primary btn-sm">Filter Log</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                        <th>IP Address</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2025-06-05 00:15:22</td>
+                                        <td>admin</td>
+                                        <td>login</td>
+                                        <td></td>
+                                        <td>192.168.1.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-05 00:16:45</td>
+                                        <td>admin</td>
+                                        <td>viewed_state_distribution</td>
+                                        <td></td>
+                                        <td>192.168.1.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-05 00:18:12</td>
+                                        <td>admin</td>
+                                        <td>viewed_user_management</td>
+                                        <td></td>
+                                        <td>192.168.1.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-04 14:22:05</td>
+                                        <td>manager</td>
+                                        <td>login</td>
+                                        <td></td>
+                                        <td>192.168.1.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-04 14:25:18</td>
+                                        <td>manager</td>
+                                        <td>viewed_businesses</td>
+                                        <td></td>
+                                        <td>192.168.1.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-05 09:45:33</td>
+                                        <td>staff</td>
+                                        <td>login</td>
+                                        <td></td>
+                                        <td>192.168.1.3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-05 09:47:12</td>
+                                        <td>staff</td>
+                                        <td>viewed_promotional_texts</td>
+                                        <td></td>
+                                        <td>192.168.1.3</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-menu">
+            <li><a href="#dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#businesses"><i class="fas fa-building"></i> Directory</a></li>
+            <li><a href="#tools"><i class="fas fa-toolbox"></i> Tools</a></li>
+            <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="#" id="mobile-menu-toggle"><i class="fas fa-bars"></i> Menu</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="username" class="form-label">Username *</label>
+                                <input type="text" class="form-control" id="username" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" required>
+                                <div class="progress password-strength-meter">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 0%" id="password-strength-meter"></div>
+                                </div>
+                                <small class="form-text text-muted">Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="full_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="full_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" id="phone_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="department" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="department">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role *</label>
+                            <select class="form-select" id="role" required>
+                                <option value="Admin">Admin</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Staff" selected>Staff</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Create User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Role Permissions JS -->
+    <script src="js/role_permissions.js"></script>
+    
+    <!-- Chart.js Implementation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the chart container exists
+            const chartContainer = document.getElementById('state-distribution-chart');
+            if (!chartContainer) return;
+            
+            // Sample data for business distribution by state
+            const stateData = {
+                labels: ['California', 'Texas', 'Florida', 'New York', 'Illinois', 'Pennsylvania', 'Ohio', 'Georgia', 'North Carolina', 'Michigan'],
+                datasets: [{
+                    label: 'Businesses by State',
+                    data: [24, 18, 16, 14, 12, 10, 9, 8, 7, 6],
+                    backgroundColor: [
+                        'rgba(41, 137, 216, 0.8)',
+                        'rgba(35, 123, 202, 0.8)',
+                        'rgba(30, 110, 188, 0.8)',
+                        'rgba(26, 96, 173, 0.8)',
+                        'rgba(22, 83, 159, 0.8)',
+                        'rgba(18, 70, 145, 0.8)',
+                        'rgba(14, 57, 130, 0.8)',
+                        'rgba(11, 44, 116, 0.8)',
+                        'rgba(8, 31, 102, 0.8)',
+                        'rgba(5, 18, 87, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(41, 137, 216, 1)',
+                        'rgba(35, 123, 202, 1)',
+                        'rgba(30, 110, 188, 1)',
+                        'rgba(26, 96, 173, 1)',
+                        'rgba(22, 83, 159, 1)',
+                        'rgba(18, 70, 145, 1)',
+                        'rgba(14, 57, 130, 1)',
+                        'rgba(11, 44, 116, 1)',
+                        'rgba(8, 31, 102, 1)',
+                        'rgba(5, 18, 87, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            // Chart configuration
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Business Distribution by State',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        color: '#1e5799'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.parsed.y} businesses`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Businesses',
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.2)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'State',
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                hover: {
+                    animationDuration: 200
+                }
+            };
+            
+            // Create the chart
+            const ctx = chartContainer.getContext('2d');
+            const stateChart = new Chart(ctx, {
+                type: 'bar',
+                data: stateData,
+                options: chartOptions
+            });
+            
+            // Add filter functionality
+            const filterSelect = document.getElementById('state-chart-filter');
+            const businessTypeSelect = document.getElementById('business-type-filter');
+            
+            if (filterSelect) {
+                filterSelect.addEventListener('change', function() {
+                    const value = this.value;
+                    let filteredData;
+                    
+                    switch(value) {
+                        case 'all':
+                            filteredData = stateData.datasets[0].data;
+                            stateChart.data.labels = stateData.labels;
+                            break;
+                        case 'top5':
+                            // Get indices of top 5 values
+                            const topIndices = [...stateData.datasets[0].data]
+                                .map((val, idx) => ({val, idx}))
+                                .sort((a, b) => b.val - a.val)
+                                .slice(0, 5)
+                                .map(item => item.idx);
+                            
+                            // Filter data to only include top 5
+                            stateChart.data.labels = topIndices.map(i => stateData.labels[i]);
+                            filteredData = topIndices.map(i => stateData.datasets[0].data[i]);
+                            stateChart.data.datasets[0].backgroundColor = topIndices.map(i => stateData.datasets[0].backgroundColor[i]);
+                            stateChart.data.datasets[0].borderColor = topIndices.map(i => stateData.datasets[0].borderColor[i]);
+                            break;
+                        case 'bottom5':
+                            // Get indices of bottom 5 values
+                            const bottomIndices = [...stateData.datasets[0].data]
+                                .map((val, idx) => ({val, idx}))
+                                .sort((a, b) => a.val - b.val)
+                                .slice(0, 5)
+                                .map(item => item.idx);
+                            
+                            // Filter data to only include bottom 5
+                            stateChart.data.labels = bottomIndices.map(i => stateData.labels[i]);
+                            filteredData = bottomIndices.map(i => stateData.datasets[0].data[i]);
+                            stateChart.data.datasets[0].backgroundColor = bottomIndices.map(i => stateData.datasets[0].backgroundColor[i]);
+                            stateChart.data.datasets[0].borderColor = bottomIndices.map(i => stateData.datasets[0].borderColor[i]);
+                            break;
+                        default:
+                            filteredData = stateData.datasets[0].data;
+                    }
+                    
+                    stateChart.data.datasets[0].data = filteredData;
+                    stateChart.update();
+                });
+            }
+            
+            // Add business type filter functionality
+            if (businessTypeSelect) {
+                businessTypeSelect.addEventListener('change', function() {
+                    const businessType = this.value;
+                    
+                    // In a real implementation, this would fetch data from the backend
+                    // For demo purposes, we'll just modify the existing data
+                    
+                    if (businessType === 'all') {
+                        stateChart.data = stateData;
+                    } else if (businessType === 'Vehicle Dealership') {
+                        stateChart.data.datasets[0].data = [8, 6, 5, 5, 4, 3, 3, 3, 2, 2];
+                        stateChart.data.datasets[0].label = 'Vehicle Dealerships by State';
+                    } else if (businessType === 'Real Estate Professional') {
+                        stateChart.data.datasets[0].data = [10, 8, 7, 6, 5, 4, 4, 3, 3, 2];
+                        stateChart.data.datasets[0].label = 'Real Estate Professionals by State';
+                    } else if (businessType === 'Apartment Rental') {
+                        stateChart.data.datasets[0].data = [6, 4, 4, 3, 3, 3, 2, 2, 2, 2];
+                        stateChart.data.datasets[0].label = 'Apartment Rentals by State';
+                    }
+                    
+                    // Reset state filter when changing business type
+                    if (filterSelect) {
+                        filterSelect.value = 'all';
+                    }
+                    
+                    stateChart.update();
+                });
+            }
+            
+            // Add chart type toggle functionality
+            const chartTypeToggle = document.getElementById('chart-type-toggle');
+            if (chartTypeToggle) {
+                chartTypeToggle.addEventListener('change', function() {
+                    const chartType = this.checked ? 'pie' : 'bar';
+                    stateChart.config.type = chartType;
+                    
+                    // Adjust options based on chart type
+                    if (chartType === 'pie') {
+                        stateChart.options.plugins.legend.display = true;
+                        stateChart.options.scales.x.display = false;
+                        stateChart.options.scales.y.display = false;
+                    } else {
+                        stateChart.options.plugins.legend.display = false;
+                        stateChart.options.scales.x.display = true;
+                        stateChart.options.scales.y.display = true;
+                    }
+                    
+                    stateChart.update();
+                });
+            }
+            
+            // Add export functionality
+            const exportButton = document.getElementById('export-chart-button');
+            if (exportButton && chartContainer) {
+                exportButton.addEventListener('click', function() {
+                    // Create a temporary link element
+                    const link = document.createElement('a');
+                    link.download = 'business_distribution_by_state.png';
+                    
+                    // Convert chart to image
+                    link.href = chartContainer.toDataURL('image/png');
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+            
+            // Password strength meter
+            const passwordInput = document.getElementById('password');
+            const strengthMeter = document.getElementById('password-strength-meter');
+            
+            if (passwordInput && strengthMeter) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    let strength = 0;
+                    
+                    // Length check
+                    if (password.length >= 10) strength += 1;
+                    
+                    // Uppercase check
+                    if (/[A-Z]/.test(password)) strength += 1;
+                    
+                    // Lowercase check
+                    if (/[a-z]/.test(password)) strength += 1;
+                    
+                    // Number check
+                    if (/[0-9]/.test(password)) strength += 1;
+                    
+                    // Symbol check
+                    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                    
+                    // Update meter
+                    strengthMeter.style.width = (strength * 20) + '%';
+                    
+                    // Update color
+                    switch(strength) {
+                        case 0:
+                        case 1:
+                            strengthMeter.className = 'progress-bar bg-danger';
+                            break;
+                        case 2:
+                        case 3:
+                            strengthMeter.className = 'progress-bar bg-warning';
+                            break;
+                        case 4:
+                        case 5:
+                            strengthMeter.className = 'progress-bar bg-success';
+                            break;
+                    }
+                });
+            }
+            
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (mobileMenuToggle && sidebar) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

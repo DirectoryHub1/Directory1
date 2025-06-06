@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - Directory Hub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block">
+            <div class="sidebar-header">
+                <h3>Directory Hub</h3>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('businesses') }}" class="nav-link">
+                        <i class="fas fa-building"></i> Businesses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('documents') }}" class="nav-link">
+                        <i class="fas fa-file-alt"></i> Documents
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('promotional_texts') }}" class="nav-link">
+                        <i class="fas fa-bullhorn"></i> Promotional Texts
+                    </a>
+                </li>
+                
+                {% if current_user.is_admin() or current_user.is_manager() %}
+                <li class="nav-item">
+                    <a href="{{ url_for('users') }}" class="nav-link">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if current_user.is_admin() %}
+                <li class="nav-item">
+                    <a href="{{ url_for('settings') }}" class="nav-link active">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                {% endif %}
+                
+                <li class="nav-header">Tool Box</li>
+                {% for tool in tools %}
+                <li class="nav-item">
+                    <a href="{{ tool.url }}" class="nav-link" target="_blank">
+                        <i class="fas fa-{{ tool.icon }}"></i> {{ tool.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Settings</h1>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Settings Tabs -->
+            <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">Security</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">Notifications</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab" aria-controls="api" aria-selected="false">API</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup" type="button" role="tab" aria-controls="backup" aria-selected="false">Backup</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="settingsTabsContent">
+                <!-- General Settings -->
+                <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">General Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="siteName" class="form-label">Site Name</label>
+                                    <input type="text" class="form-control" id="siteName" value="Directory Hub">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="siteDescription" class="form-label">Site Description</label>
+                                    <textarea class="form-control" id="siteDescription" rows="2">A comprehensive business directory platform for managing and accessing business listings.</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contactEmail" class="form-label">Contact Email</label>
+                                    <input type="email" class="form-control" id="contactEmail" value="admin@directoryhub.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="timezone" class="form-label">Timezone</label>
+                                    <select class="form-select" id="timezone">
+                                        <option value="UTC">UTC</option>
+                                        <option value="America/New_York" selected>Eastern Time (US & Canada)</option>
+                                        <option value="America/Chicago">Central Time (US & Canada)</option>
+                                        <option value="America/Denver">Mountain Time (US & Canada)</option>
+                                        <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="dateFormat" class="form-label">Date Format</label>
+                                    <select class="form-select" id="dateFormat">
+                                        <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="itemsPerPage" class="form-label">Items Per Page</label>
+                                    <select class="form-select" id="itemsPerPage">
+                                        <option value="10">10</option>
+                                        <option value="25" selected>25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Security Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Password Requirements</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="minLength" checked disabled>
+                                        <label class="form-check-label" for="minLength">
+                                            Minimum 10 characters
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="requireUppercase" checked disabled>
+                                        <label class="form-check-label" for="requireUppercase">
+                                            Require uppercase letters
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="requireLowercase" checked disabled>
+                                        <label class="form-check-label" for="requireLowercase">
+                                            Require lowercase letters
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="requireNumbers" checked disabled>
+                                        <label class="form-check-label" for="requireNumbers">
+                                            Require numbers
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="requireSymbols" checked disabled>
+                                        <label class="form-check-label" for="requireSymbols">
+                                            Require symbols
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="passwordExpiration" class="form-label">Password Expiration</label>
+                                    <select class="form-select" id="passwordExpiration">
+                                        <option value="30">30 days</option>
+                                        <option value="60">60 days</option>
+                                        <option value="90" selected>90 days (3 months)</option>
+                                        <option value="180">180 days (6 months)</option>
+                                        <option value="365">365 days (1 year)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="loginAttempts" class="form-label">Maximum Login Attempts</label>
+                                    <select class="form-select" id="loginAttempts">
+                                        <option value="3">3 attempts</option>
+                                        <option value="5" selected>5 attempts</option>
+                                        <option value="10">10 attempts</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sessionTimeout" class="form-label">Session Timeout</label>
+                                    <select class="form-select" id="sessionTimeout">
+                                        <option value="15">15 minutes</option>
+                                        <option value="30" selected>30 minutes</option>
+                                        <option value="60">60 minutes</option>
+                                        <option value="120">2 hours</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="twoFactorAuth">
+                                        <label class="form-check-label" for="twoFactorAuth">Enable Two-Factor Authentication</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Settings -->
+                <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Notification Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Email Notifications</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="newUserNotification" checked>
+                                        <label class="form-check-label" for="newUserNotification">New user registrations</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="passwordResetNotification" checked>
+                                        <label class="form-check-label" for="passwordResetNotification">Password reset requests</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="loginFailureNotification" checked>
+                                        <label class="form-check-label" for="loginFailureNotification">Failed login attempts</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="systemUpdateNotification" checked>
+                                        <label class="form-check-label" for="systemUpdateNotification">System updates</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">User Notifications</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="passwordExpirationNotification" checked>
+                                        <label class="form-check-label" for="passwordExpirationNotification">Password expiration reminders</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="newBusinessNotification" checked>
+                                        <label class="form-check-label" for="newBusinessNotification">New business listings</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="maintenanceNotification" checked>
+                                        <label class="form-check-label" for="maintenanceNotification">Scheduled maintenance</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notificationEmail" class="form-label">Notification Email</label>
+                                    <input type="email" class="form-control" id="notificationEmail" value="notifications@directoryhub.com">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- API Settings -->
+                <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">API Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> API access allows external applications to interact with your Directory Hub data.
+                            </div>
+                            <div class="mb-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enableApi" checked>
+                                    <label class="form-check-label" for="enableApi">Enable API Access</label>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h6>API Keys</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Key Name</th>
+                                                <th>API Key</th>
+                                                <th>Created</th>
+                                                <th>Last Used</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Primary Key</td>
+                                                <td><code>dh_api_********_primary</code></td>
+                                                <td>Jun 1, 2025</td>
+                                                <td>Jun 5, 2025</td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-outline-secondary">Reveal</button>
+                                                        <button class="btn btn-sm btn-outline-warning">Regenerate</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mobile App</td>
+                                                <td><code>dh_api_********_mobile</code></td>
+                                                <td>Jun 2, 2025</td>
+                                                <td>Jun 4, 2025</td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-outline-secondary">Reveal</button>
+                                                        <button class="btn btn-sm btn-outline-warning">Regenerate</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-outline-primary mt-2">
+                                    <i class="fas fa-plus"></i> Generate New API Key
+                                </button>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Rate Limiting</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="rateLimit" class="form-label">Requests per minute</label>
+                                        <input type="number" class="form-control" id="rateLimit" value="60">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="dailyLimit" class="form-label">Daily request limit</label>
+                                        <input type="number" class="form-control" id="dailyLimit" value="10000">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Backup Settings -->
+                <div class="tab-pane fade" id="backup" role="tabpanel" aria-labelledby="backup-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Backup & Restore</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Regular backups are essential to prevent data loss. We recommend daily automated backups.
+                            </div>
+                            <div class="mb-4">
+                                <h6>Automated Backups</h6>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enableAutomatedBackups" checked>
+                                    <label class="form-check-label" for="enableAutomatedBackups">Enable Automated Backups</label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="backupFrequency" class="form-label">Backup Frequency</label>
+                                        <select class="form-select" id="backupFrequency">
+                                            <option value="daily" selected>Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="backupTime" class="form-label">Backup Time</label>
+                                        <input type="time" class="form-control" id="backupTime" value="02:00">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="retentionPeriod" class="form-label">Retention Period</label>
+                                    <select class="form-select" id="retentionPeriod">
+                                        <option value="7">7 days</option>
+                                        <option value="14">14 days</option>
+                                        <option value="30" selected>30 days</option>
+                                        <option value="90">90 days</option>
+                                        <option value="365">365 days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h6>Manual Backup</h6>
+                                <p>Create an immediate backup of your Directory Hub data.</p>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="backupUsers" checked>
+                                            <label class="form-check-label" for="backupUsers">
+                                                User Data
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="backupBusinesses" checked>
+                                            <label class="form-check-label" for="backupBusinesses">
+                                                Business Data
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="backupDocuments" checked>
+                                            <label class="form-check-label" for="backupDocuments">
+                                                Documents
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="backupSettings" checked>
+                                            <label class="form-check-label" for="backupSettings">
+                                                Settings
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="backupLogs" checked>
+                                            <label class="form-check-label" for="backupLogs">
+                                                Activity Logs
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="backupTemplates" checked>
+                                            <label class="form-check-label" for="backupTemplates">
+                                                Templates
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary mt-2">
+                                    <i class="fas fa-download"></i> Create Backup
+                                </button>
+                            </div>
+                            <div class="mb-4">
+                                <h6>Recent Backups</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Size</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Jun 5, 2025 02:00</td>
+                                                <td>24.7 MB</td>
+                                                <td>Automated</td>
+                                                <td><span class="badge bg-success">Complete</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                        <button class="btn btn-sm btn-outline-warning">Restore</button>
+                                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jun 4, 2025 02:00</td>
+                                                <td>24.5 MB</td>
+                                                <td>Automated</td>
+                                                <td><span class="badge bg-success">Complete</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                        <button class="btn btn-sm btn-outline-warning">Restore</button>
+                                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jun 3, 2025 15:30</td>
+                                                <td>24.3 MB</td>
+                                                <td>Manual</td>
+                                                <td><span class="badge bg-success">Complete</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                        <button class="btn btn-sm btn-outline-warning">Restore</button>
+                                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Restore from Backup</h6>
+                                <div class="mb-3">
+                                    <label for="backupFile" class="form-label">Upload Backup File</label>
+                                    <input class="form-control" type="file" id="backupFile">
+                                </div>
+                                <button class="btn btn-warning">
+                                    <i class="fas fa-upload"></i> Restore from File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Mobile Navigation -->
+<nav class="mobile-nav d-md-none">
+    <ul class="mobile-nav-menu">
+        <li>
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('businesses') }}">
+                <i class="fas fa-building"></i>
+                Businesses
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('documents') }}">
+                <i class="fas fa-file-alt"></i>
+                Documents
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('promotional_texts') }}">
+                <i class="fas fa-bullhorn"></i>
+                Promo
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('logout') }}">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endblock %}

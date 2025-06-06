@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - User Permissions{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>User Permissions: {{ user.username }}</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Tool Access Permissions</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.user_permissions', user_id=user.id) }}">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tool</th>
+                                <th>Description</th>
+                                <th>Access</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tool in tools %}
+                            <tr>
+                                <td>{{ tool.name }}</td>
+                                <td>{{ tool.description }}</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="tool_{{ tool.id }}" name="tool_{{ tool.id }}"
+                                            {% if tool.id in user_permissions and user_permissions[tool.id] %}checked{% endif %}
+                                            {% if user.role == 'Admin' %}disabled checked{% endif %}>
+                                        <label class="form-check-label" for="tool_{{ tool.id }}">
+                                            {% if user.role == 'Admin' %}Always allowed (Admin){% else %}Allow access{% endif %}
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="{{ url_for('admin.permissions') }}" class="btn btn-secondary">Back</a>
+                    {% if user.role != 'Admin' %}
+                    <button type="submit" class="btn btn-primary">Save Permissions</button>
+                    {% else %}
+                    <button type="button" class="btn btn-secondary" disabled>Admin has all permissions</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

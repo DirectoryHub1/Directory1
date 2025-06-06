@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Error - Directory Hub{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Error</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Something went wrong</h5>
+                    <p class="card-text">{{ error_message }}</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Home</a>
+                        <a href="javascript:history.back()" class="btn btn-outline-secondary ml-2">Go Back</a>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>If this problem persists, please contact the administrator.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
