@@ -1,221 +1,141 @@
-from flask import Flask, render_template, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 import os
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
-# Import modules
-from .models.user import db, User, Tool, Permission
-from .auth import auth_bp, init_app as init_auth
-from .admin import admin_bp
-from .main import main_bp
-from .data import data_bp
+# Initialize Flask app
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key') # Use environment variable for secret key
 
-def create_app():
-    app = Flask(__name__)
-    
-    # Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-for-testing')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///directory_hub.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Initialize extensions
-    db.init_app(app)
-    init_auth(app)
-    
-    # Register blueprints
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(admin_bp)
-    app.register_blueprint(main_bp)
-    app.register_blueprint(data_bp)
-    
-    # Create database tables
-    with app.app_context():
-        db.create_all()
-        
-        # Create default tools if they don't exist
-        create_default_tools()
-        
-        # Create admin user if no users exist
-        create_admin_user()
-        
-        # Create sample business data if none exists
-        create_sample_businesses()
-    
-    # Main routes
-    @app.route('/')
-    def index():
-        return redirect(url_for('auth.login'))
-    
-    @app.errorhandler(404)
-    def page_not_found(e):
-        return render_template('404.html'), 404
-    
-    @app.errorhandler(500)
-    def internal_server_error(e):
-        return render_template('500.html'), 500
-    
-    return app
+# MongoDB Connection
+# Get MongoDB URI from environment variable
+MONGO_URI = os.environ.get('MONGODB_URI')
 
-def create_default_tools():
-    """Create default tools if they don't exist"""
-    default_tools = [
-        {
-            'name': 'Email Marketing',
-            'description': 'Use our directory data for targeted email marketing campaigns.',
-            'url': 'https://ymlp.com',
-            'icon': '✉️'
-        },
-        {
-            'name': 'Postal Mail',
-            'description': 'Send physical mail to businesses in our directory.',
-            'url': 'https://postalmethods.com',
-            'icon': '📬'
-        },
-        {
-            'name': 'Label Making',
-            'description': 'Create mailing labels from our directory data.',
-            'url': 'https://avery.com/templates',
-            'icon': '🏷️'
-        },
-        {
-            'name': 'Mass Calls & Texting',
-            'description': 'Send mass calls and text messages to businesses in our directory.',
-            'url': 'https://dialmycalls.com',
-            'icon': '📱'
-        },
-        {
-            'name': 'Promotional Texts',
-            'description': 'Access promotional text templates for NoteStacker.com.',
-            'url': '#promotional-texts',
-            'icon': '💬'
-        }
-    ]
-    
-    for tool_data in default_tools:
-        tool = Tool.query.filter_by(name=tool_data['name']).first()
-        if not tool:
-            tool = Tool(**tool_data)
-            db.session.add(tool)
-    
-    db.session.commit()
+if not MONGO_URI:
+    # Fallback for local development if MONGO_URI is not set
+    # In production on Vercel, MONGO_URI MUST be set as an environment variable
+    print("Error: MONGODB_URI environment variable not set.")
+    # You might want to raise an exception or handle this more gracefully
+    # For now, we'll use a placeholder to allow the app to start, but it won't connect
+    # In a real scenario, this should prevent the app from running without a DB
+    MONGO_URI = "mongodb://localhost:27017/test_db" 
 
-def create_admin_user():
-    """Create admin user if no users exist"""
-    if User.query.count() == 0:
-        admin = User(
-            username='admin',
-            email='admin@directoryhub.com',
-            full_name='Administrator',
-            role='Admin',
-            is_active=True
-        )
-        admin.set_password('Admin123!')
-        db.session.add(admin)
-        
-        # Also create a manager and staff user for testing
-        manager = User(
-            username='manager',
-            email='manager@directoryhub.com',
-            full_name='Manager User',
-            role='Manager',
-            is_active=True
-        )
-        manager.set_password('Manager123!')
-        db.session.add(manager)
-        
-        staff = User(
-            username='staff',
-            email='staff@directoryhub.com',
-            full_name='Staff User',
-            role='Staff',
-            is_active=True
-        )
-        staff.set_password('Staff123!')
-        db.session.add(staff)
-        
-        db.session.commit()
+try:
+    client = MongoClient(MONGO_URI)
+    db = client.get_database('directory_hub') # Specify your database name here
+    users_collection = db.users
+    businesses_collection = db.businesses
+    print("MongoDB connection successful!")
+except Exception as e:
+    print(f"Error connecting to MongoDB: {e}")
+    # In a production environment, you might want to exit or log this more severely
+    client = None # Ensure client is None if connection fails
+    db = None
 
-def create_sample_businesses():
-    """Create sample business data if none exists"""
-    from .models.content import Business
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+class User:
+    def __init__(self, user_id, email, password, role):
+        self.id = str(user_id)
+        self.email = email
+        self.password = password
+        self.role = role
+
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+@login_manager.user_loader
+def load_user(user_id):
+    if db and users_collection:
+        user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+        if user_data:
+            return User(user_data["_id"], user_data["email"], user_data["password"], user_data["role"])
+    return None
+
+# Routes
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not db or not users_collection:
+            flash('Database not connected. Please check server configuration.', 'danger')
+            return render_template('login.html')
+
+        user_data = users_collection.find_one({'email': email})
+
+        if user_data and check_password_hash(user_data['password'], password):
+            user = User(user_data['_id'], user_data['email'], user_data['password'], user_data['role'])
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid email or password', 'danger')
+    return render_template('login.html')
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    # Example data for dashboard - replace with actual data from MongoDB
+    total_businesses = 0
+    if db and businesses_collection:
+        total_businesses = businesses_collection.count_documents({})
+    return render_template('dashboard.html', total_businesses=total_businesses)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# Admin routes (example - you'll have more)
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if current_user.role != 'Admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('dashboard'))
     
-    if Business.query.count() == 0:
-        # Sample data for businesses across different states
-        sample_businesses = [
-            # Vehicle Dealerships
-            {'name': 'ABC Auto Sales', 'type': 'Vehicle Dealership', 'state': 'California', 'city': 'Los Angeles'},
-            {'name': 'XYZ Motors', 'type': 'Vehicle Dealership', 'state': 'Texas', 'city': 'Houston'},
-            {'name': 'Sunshine Cars', 'type': 'Vehicle Dealership', 'state': 'Florida', 'city': 'Miami'},
-            {'name': 'Empire Auto', 'type': 'Vehicle Dealership', 'state': 'New York', 'city': 'Buffalo'},
-            {'name': 'Windy City Motors', 'type': 'Vehicle Dealership', 'state': 'Illinois', 'city': 'Chicago'},
-            {'name': 'Keystone Cars', 'type': 'Vehicle Dealership', 'state': 'Pennsylvania', 'city': 'Philadelphia'},
-            {'name': 'Buckeye Auto', 'type': 'Vehicle Dealership', 'state': 'Ohio', 'city': 'Columbus'},
-            {'name': 'Peach State Motors', 'type': 'Vehicle Dealership', 'state': 'Georgia', 'city': 'Atlanta'},
-            {'name': 'Tar Heel Autos', 'type': 'Vehicle Dealership', 'state': 'North Carolina', 'city': 'Charlotte'},
-            {'name': 'Great Lakes Cars', 'type': 'Vehicle Dealership', 'state': 'Michigan', 'city': 'Detroit'},
-            
-            # Real Estate Professionals
-            {'name': 'Golden State Realty', 'type': 'Real Estate Professional', 'state': 'California', 'city': 'San Francisco'},
-            {'name': 'Lone Star Properties', 'type': 'Real Estate Professional', 'state': 'Texas', 'city': 'Dallas'},
-            {'name': 'Sunshine Homes', 'type': 'Real Estate Professional', 'state': 'Florida', 'city': 'Orlando'},
-            {'name': 'Empire State Realty', 'type': 'Real Estate Professional', 'state': 'New York', 'city': 'New York City'},
-            {'name': 'Windy City Homes', 'type': 'Real Estate Professional', 'state': 'Illinois', 'city': 'Chicago'},
-            {'name': 'Keystone Properties', 'type': 'Real Estate Professional', 'state': 'Pennsylvania', 'city': 'Pittsburgh'},
-            {'name': 'Buckeye Realty', 'type': 'Real Estate Professional', 'state': 'Ohio', 'city': 'Cleveland'},
-            {'name': 'Peach State Properties', 'type': 'Real Estate Professional', 'state': 'Georgia', 'city': 'Savannah'},
-            {'name': 'Carolina Homes', 'type': 'Real Estate Professional', 'state': 'North Carolina', 'city': 'Raleigh'},
-            {'name': 'Great Lakes Realty', 'type': 'Real Estate Professional', 'state': 'Michigan', 'city': 'Ann Arbor'},
-            
-            # Apartment Rentals
-            {'name': 'Pacific View Apartments', 'type': 'Apartment Rental', 'state': 'California', 'city': 'San Diego'},
-            {'name': 'Texas Towers', 'type': 'Apartment Rental', 'state': 'Texas', 'city': 'Austin'},
-            {'name': 'Palm Beach Residences', 'type': 'Apartment Rental', 'state': 'Florida', 'city': 'Tampa'},
-            {'name': 'Manhattan Lofts', 'type': 'Apartment Rental', 'state': 'New York', 'city': 'New York City'},
-            {'name': 'Lakefront Apartments', 'type': 'Apartment Rental', 'state': 'Illinois', 'city': 'Chicago'},
-            {'name': 'Liberty Bell Residences', 'type': 'Apartment Rental', 'state': 'Pennsylvania', 'city': 'Philadelphia'},
-            {'name': 'Riverside Apartments', 'type': 'Apartment Rental', 'state': 'Ohio', 'city': 'Cincinnati'},
-            {'name': 'Magnolia Apartments', 'type': 'Apartment Rental', 'state': 'Georgia', 'city': 'Atlanta'},
-            {'name': 'Blue Ridge Residences', 'type': 'Apartment Rental', 'state': 'North Carolina', 'city': 'Asheville'},
-            {'name': 'Great Lakes Apartments', 'type': 'Apartment Rental', 'state': 'Michigan', 'city': 'Grand Rapids'}
-        ]
-        
-        # Add more businesses to reach the total counts mentioned in the dashboard
-        # (152 total: 48 vehicle dealerships, 64 real estate professionals, 40 apartment rentals)
-        
-        # Add more Vehicle Dealerships to reach 48
-        states = ['California', 'Texas', 'Florida', 'New York', 'Illinois', 'Pennsylvania', 'Ohio', 'Georgia', 'North Carolina', 'Michigan']
-        for i in range(38):  # Already have 10, need 38 more
-            state = states[i % len(states)]
-            sample_businesses.append({
-                'name': f'Auto Dealer {i+1}',
-                'type': 'Vehicle Dealership',
-                'state': state,
-                'city': f'City {i+1}'
-            })
-        
-        # Add more Real Estate Professionals to reach 64
-        for i in range(54):  # Already have 10, need 54 more
-            state = states[i % len(states)]
-            sample_businesses.append({
-                'name': f'Realty Group {i+1}',
-                'type': 'Real Estate Professional',
-                'state': state,
-                'city': f'City {i+1}'
-            })
-        
-        # Add more Apartment Rentals to reach 40
-        for i in range(30):  # Already have 10, need 30 more
-            state = states[i % len(states)]
-            sample_businesses.append({
-                'name': f'Apartment Complex {i+1}',
-                'type': 'Apartment Rental',
-                'state': state,
-                'city': f'City {i+1}'
-            })
-        
-        # Add all businesses to database
-        for business_data in sample_businesses:
-            business = Business(**business_data)
-            db.session.add(business)
-        
-        db.session.commit()
+    users = []
+    if db and users_collection:
+        users = list(users_collection.find({}))
+    return render_template('admin_users.html', users=users)
+
+# Add other routes as needed for businesses, documents, etc.
+
+# Initial user setup (run once, e.g., on first deploy or via a script)
+# This part should ideally be handled outside the main app run for production
+# For testing, you can uncomment and run once, then comment out
+# with app.app_context():
+#     if db and users_collection and users_collection.count_documents({}) == 0:
+#         hashed_password = generate_password_hash('Admin123!', method='sha256')
+#         users_collection.insert_one({
+#             'email': 'admin@directoryhub.com',
+#             'password': hashed_password,
+#             'role': 'Admin'
+#         })
+#         print("Default admin user created.")
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
