@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**",  # Changed from "api/wsgi.py"
+      "src": "api/**",
       "use": "@vercel/python",
       "config": {
         "pythonVersion": "3.9.18"
