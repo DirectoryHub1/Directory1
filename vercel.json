@@ -8,5 +8,6 @@
     { "src": "/(.*)", "dest": "static/$1" }
   ],
   "installCommand": "pip install -r api/requirements.txt",
-  "buildCommand": "python -c \"print(\'Build complete\')\""
+  "buildCommand": "python -c \"print(\'Build complete\')\"",
+  "pythonVersion": "3.9.18"
 }
