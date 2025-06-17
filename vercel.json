@@ -11,9 +11,14 @@
     { "src": "static/**", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "api/wsgi.py" },
+    { "src": "/api/(.* )", "dest": "api/wsgi.py" },
     { "src": "/(.*)", "dest": "static/$1" }
   ],
   "installCommand": "pip install -r api/requirements.txt",
-  "buildCommand": "python -c \"print('Build complete')\""
+  "buildCommand": "python -c \"print('Build complete')\"",
+  "env": {
+    "PYTHONPATH": "/var/task/api"
+  }
 }
+
+
