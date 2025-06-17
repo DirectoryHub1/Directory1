@@ -53,7 +53,7 @@ class User:
 
 @login_manager.user_loader
 def load_user(user_id):
-    if db and users_collection:
+    if db is not None and users_collection is not None:
         user_data = users_collection.find_one({"_id": ObjectId(user_id)})
         if user_data:
             return User(user_data["_id"], user_data["email"], user_data["password"], user_data["role"])
@@ -73,7 +73,7 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        if not db or not users_collection:
+        if db is None or users_collection is None:
             return '<h1>Database not connected. Please check server configuration.</h1>'
 
         user_data = users_collection.find_one({'email': email})
@@ -106,7 +106,7 @@ def login():
 @login_required
 def dashboard():
     total_businesses = 0
-    if db and businesses_collection:
+    if db is not None and businesses_collection is not None:
         total_businesses = businesses_collection.count_documents({})
     
     return f'''
@@ -130,7 +130,7 @@ def api_test():
 # Create admin user if none exists
 @app.route('/setup')
 def setup():
-    if db and users_collection and users_collection.count_documents({}) == 0:
+    if db is not None and users_collection is not None and users_collection.count_documents({}) == 0:
         hashed_password = generate_password_hash('Admin123!')
         users_collection.insert_one({
             'email': 'admin@directoryhub.com',
@@ -139,3 +139,4 @@ def setup():
         })
         return "Default admin user created: admin@directoryhub.com / Admin123!"
     return "Admin user already exists or database not connected."
+
